@@ -4,37 +4,10 @@
 ******************************************************************/
 #pragma once
 
+#include "marker_fwd.h"
 class QImage;
 class QPrinter;
-
 namespace dgelom {
-enum class om_marker_tag
-{
-	CODED = 0,
-	UNCOD = 1,
-	TS = 2
-};
-enum class om_output_type {
-	IMG = 0,
-	PDF = 1
-};
-
-struct om_page_size {
-	size_t width, height;
-	size_t lr_margin;
-	size_t tb_margin;
-};
-
-struct om_code_sector {
-	float cx, cy;
-	size_t radius;
-	int start, span;
-	template<typename T> 
-	inline auto rect() const noexcept {
-		return T{ cx - radius, cy - radius, radius * 2., radius * 2. };
-	}
-};
-
 struct om_marker_type {
 	struct label_t {
 		QPointF pos;
@@ -53,13 +26,6 @@ struct marker_data_type {
 	QSize page_size;
 	QList<QVector<om_marker_type>> data;
 };
-
-template<om_marker_tag _Type>
-class OpticalMarkers {
-	static_assert(true, 
-		"Undefined marker type in OpticalMarkers<_Type>.");
-};
-
 template<>
 class OpticalMarkers<om_marker_tag::CODED>
 {
@@ -67,15 +33,17 @@ class OpticalMarkers<om_marker_tag::CODED>
 	static constexpr auto _Mydpi = T(254);
 	using _Mypie_type = om_code_sector;
 public:
+	using value_t = float_t;
 	using shared_qimage = std::shared_ptr<QImage>;
 	using shared_pdfeng = std::shared_ptr<QPrinter>;
 	using image_pointer = std::tuple<uchar*, size_t, size_t>;
+	using marker_desc_cont = std::vector<om_marker_desc<value_t>>;
 	struct options_type {
-		float  inner_radius = 2.5; //mm
+		value_t  inner_radius = 2.5; //mm
 		size_t start_id = 0;
 		size_t end_id = 53;
 		size_t code_bits = 15;
-		float  spacing = 0.5; // mm
+		value_t  spacing = 0.5; // mm
 	};
 	using options_t = options_type;
 	
@@ -105,7 +73,7 @@ public:
 	/// \brief Decode the coded makers.
 	/// </summary>
 	/// <returns></returns>
-	QVector<QPointF> decode(const image_pointer image) noexcept;
+	marker_desc_cont decode(const image_pointer image) noexcept;
 
 	/// <summary>
 	/// \brief Get the rect size of a single marker.
