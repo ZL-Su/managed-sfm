@@ -76,6 +76,14 @@ public:
 	marker_desc_cont decode(const image_pointer image) noexcept;
 
 	/// <summary>
+	/// \brief Get reserved markers. Default is the markers 0, 1, 2, and 3.
+	/// This method is often used to seperate the codes on the scale-bar(s).
+	/// </summary>
+	/// <param name="markers">All detected markers by the method "decode". It will be overwritten by non-reserved ones.</param>
+	/// <returns>Reserved marker list.</returns>
+	marker_desc_cont get_reserved(marker_desc_cont& markers) noexcept;
+
+	/// <summary>
 	/// \brief Get the rect size of a single marker.
 	/// </summary>
 	/// <returns></returns>
